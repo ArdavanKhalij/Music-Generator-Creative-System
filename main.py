@@ -3,43 +3,12 @@
 #############################################################################
 import random
 import scipy
+from numpy.random import choice
 from scipy.io.wavfile import read as wavread
 import time
 import numpy as np
 import math
 #############################################################################
-# import wave
-# w_one = wave.open('01 Up and Down.wav', 'r')
-# w_two = wave.open('02 Up and Down (Piano).wav', 'r')
-#
-# print(w_one.readframes(1))
-# print(w_two.readframes(1))
-#
-# if w_one.readframes(1) == w_two.readframes(1):
-#     print('exactly the same')
-# else:
-#     print('not a match')
-
-# [samplerate, y] = wavread('despair2.wav')
-# [samplerate, z] = wavread('upanddown1.wav')
-# print(samplerate, len(y)/samplerate, len(z)/samplerate)
-
-# start = time.time()
-# w = []
-#
-# for x in range(0, 10*samplerate):
-#     y1, y2 = [y[x][0], y[x][1]]
-#     z1, z2 = [z[x][0], z[x][1]]
-#     w.append([int((y1+z1)/2), int((y2+z2)/2)])
-#     # print(x)
-#     # print(y1, y2, z1, z2)
-#
-# print(w)
-# ww = np.array(w)
-# scipy.io.wavfile.write('sample.wav', samplerate, ww.astype(np.int16))
-#
-# end = time.time()
-# print(end - start)
 
 
 
@@ -47,7 +16,7 @@ import math
 # General info of algorithm
 #############################################################################
 # Number of primary population
-NumberOfPrimaryPopulation = 100
+NumberOfPrimaryPopulation = 10
 # Number of Generations
 NumberOfGenerations = 100
 # Mutation Probability
@@ -186,12 +155,13 @@ def Fitness(Population):
 
 
 #############################################################################
-# Roulette wheel mutation
+# Roulette wheel
 #############################################################################
-def RouletteWheelMutation(Population):
+def RouletteWheel(Population):
     print("-----------------------------------------")
     print("Roulette Wheel Mutation")
     print("-----------------------------------------")
+    NewPopulation = []
     Scores = Fitness(Population)
     ScoreSum = sum(Scores)
     NormalizedScores = []
@@ -200,7 +170,20 @@ def RouletteWheelMutation(Population):
     res = 1 - sum(NormalizedScores)
     index = len(NormalizedScores)-1
     NormalizedScores[index] = NormalizedScores[index] + res
-    return NormalizedScores
+    q = list(range(0, len(PrimaryPopulation)))
+    for i in range(0, NumberOfPrimaryPopulation):
+        draw = choice(q, 1, p=NormalizedScores)
+        NewPopulation.append(Population[draw[0]])
+    return NewPopulation
+#############################################################################
+
+
+
+#############################################################################
+# Mutation
+#############################################################################
+def Mutation():
+    pass
 #############################################################################
 
 
@@ -218,7 +201,7 @@ def Crossover():
 # Test
 #############################################################################
 print(SimilarityOfSongs(SongData1, SongData2))
-RouletteWheelMutation(PrimaryPopulation)
+print(RouletteWheel(PrimaryPopulation))
 #############################################################################
 
 # heuristic to see the similarity of learning data and choose base on that to give songs value with fuzzy logic
