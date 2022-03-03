@@ -159,13 +159,13 @@ def Fitness(Population):
 #############################################################################
 def RouletteWheel(Population):
     print("-----------------------------------------")
-    print("Roulette Wheel Mutation")
+    print("Roulette Wheel")
     print("-----------------------------------------")
     NewPopulation = []
     Scores = Fitness(Population)
     ScoreSum = sum(Scores)
     NormalizedScores = []
-    for i in range(0, NumberOfPrimaryPopulation):
+    for i in range(0, len(Population)):
         NormalizedScores.append(Scores[i]/ScoreSum)
     res = 1 - sum(NormalizedScores)
     index = len(NormalizedScores)-1
@@ -215,10 +215,34 @@ def RSMMutation(Population):
 
 
 #############################################################################
-# Crossover
+# Mixing
 #############################################################################
-def Crossover():
-    pass
+def Mixing(Person1, Person2):
+    child1 = []
+    child2 = []
+    for i in range(0, len(Person1)):
+        child1.append((Person1[i]+(2*Person2[i]))/3)
+        child2.append((Person2[i] + (2 * Person1[i])) / 3)
+    return [Person1, Person2, child1, child2]
+#############################################################################
+
+
+
+#############################################################################
+# Mating
+#############################################################################
+def Mating(Population):
+    NewPopulation = []
+    PopulationForMating = RouletteWheel(Population)
+    for i in range(0, NumberOfPrimaryPopulation):
+        n1 = PopulationForMating[i]
+        n2 = PopulationForMating[i + 1]
+        res = Mixing(n1, n2)
+        NewPopulation.append(res[0])
+        NewPopulation.append(res[1])
+        NewPopulation.append(res[2])
+        NewPopulation.append(res[3])
+    return NewPopulation
 #############################################################################
 
 
