@@ -16,7 +16,7 @@ import math
 # General info of algorithm
 #############################################################################
 # Number of primary population
-NumberOfPrimaryPopulation = 10
+NumberOfPrimaryPopulation = 100
 # Number of Generations
 NumberOfGenerations = 100
 # Mutation Probability
@@ -182,8 +182,34 @@ def RouletteWheel(Population):
 #############################################################################
 # Mutation
 #############################################################################
-def Mutation():
-    pass
+def RSMMutation(Population):
+    print("-----------------------------------------")
+    print("Mutation")
+    print("-----------------------------------------")
+    for i in range(0, NumberOfPrimaryPopulation):
+        choose = random.uniform(0, 1)
+        if choose <= MutationProbability:
+            a = random.randint(0, (SongLength*SampleRate))
+            b = random.randint(0, (SongLength*SampleRate)-1)
+            while a == b:
+                b = random.randint(0, (SongLength * SampleRate)-1)
+            if a > b:
+                while a > b:
+                    n1 = Population[a]
+                    n2 = Population[b]
+                    Population[b] = n1
+                    Population[a] = n2
+                    a = a - 1
+                    b = b + 1
+            else:
+                while a < b:
+                    n1 = Population[a]
+                    n2 = Population[b]
+                    Population[b] = n1
+                    Population[a] = n2
+                    a = a + 1
+                    b = b - 1
+    return Population
 #############################################################################
 
 
