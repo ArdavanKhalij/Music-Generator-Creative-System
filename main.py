@@ -1,24 +1,27 @@
-#############################################################################
+############################################################################################
 # Libraries
-#############################################################################
+############################################################################################
 import random
+
+import matplotlib.pyplot as plt
 import scipy
 from numpy.random import choice
 from scipy.io.wavfile import read as wavread
+import copy
 import time
 import numpy as np
 import math
-#############################################################################
+############################################################################################
 
 
 
-#############################################################################
+############################################################################################
 # General info of algorithm
-#############################################################################
+############################################################################################
 # Number of primary population
-NumberOfPrimaryPopulation = 100
+NumberOfPrimaryPopulation = 20
 # Number of Generations
-NumberOfGenerations = 100
+NumberOfGenerations = 20
 # Mutation Probability
 MutationProbability = 0.1
 # Sample rate
@@ -41,13 +44,13 @@ SongName6 = 'despair2.wav'
 SongName7 = 'despair3.wav'
 # Domain
 Domain = 32768 + 32767
-#############################################################################
+############################################################################################
 
 
 
-#############################################################################
+############################################################################################
 # Song Decoder
-#############################################################################
+############################################################################################
 def SongDecoder(SongName):
     DataOfSong = []
     [_, y] = wavread(SongName)
@@ -56,13 +59,13 @@ def SongDecoder(SongName):
         res = int((y1 + y2) / 2)
         DataOfSong.append(res)
     return DataOfSong
-#############################################################################
+############################################################################################
 
 
 
-#############################################################################
+############################################################################################
 # Data of Songs
-#############################################################################
+############################################################################################
 SongData1 = SongDecoder(SongName1)
 SongData2 = SongDecoder(SongName2)
 SongData3 = SongDecoder(SongName3)
@@ -70,13 +73,13 @@ SongData4 = SongDecoder(SongName4)
 SongData5 = SongDecoder(SongName5)
 SongData6 = SongDecoder(SongName6)
 SongData7 = SongDecoder(SongName7)
-#############################################################################
+############################################################################################
 
 
 
-#############################################################################
+############################################################################################
 # Find the  local minimum and maximum
-#############################################################################
+############################################################################################
 domainOfAllSongs = []
 domainOfAllSongs.append(min(SongData1))
 domainOfAllSongs.append(max(SongData1))
@@ -96,13 +99,13 @@ MinOfDomain = min(domainOfAllSongs)
 MaxOfDomain = max(domainOfAllSongs)
 Domain = MaxOfDomain - MinOfDomain
 print(MinOfDomain, MaxOfDomain, Domain)
-#############################################################################
+############################################################################################
 
 
 
-#############################################################################
+############################################################################################
 # Random Primary Population
-#############################################################################
+############################################################################################
 print("-----------------------------------------")
 print("Primary Population")
 print("-----------------------------------------")
@@ -112,13 +115,13 @@ for i in range(0, NumberOfPrimaryPopulation):
     print(i)
     for _ in range(0, int(SongLength*SampleRate)):
         PrimaryPopulation[i].append(random.randint(MinOfDomain, MaxOfDomain))
-#############################################################################
+############################################################################################
 
 
 
-#############################################################################
+############################################################################################
 # Percent of similarity of two songs
-#############################################################################
+############################################################################################
 def SimilarityOfSongs(DataOfSong1, DataOfSong2):
     SimilarityScore = []
     # 1-(DataOfSong1[i][0] - DataOfSong2[i][0])/Domain
@@ -126,20 +129,20 @@ def SimilarityOfSongs(DataOfSong1, DataOfSong2):
         res = abs(DataOfSong1[i] - DataOfSong2[i])
         SimilarityScore.append(1 - res / Domain)
     return sum(SimilarityScore)/len(SimilarityScore)
-#############################################################################
+############################################################################################
 
 
 
-#############################################################################
+############################################################################################
 # Fitness function
-#############################################################################
+############################################################################################
 def Fitness(Population):
     print("-----------------------------------------")
     print("Fitness Function")
     print("-----------------------------------------")
     Scores = []
     res = 0
-    for i in range(0, NumberOfPrimaryPopulation):
+    for i in range(0, len(Population)):
         res = res + SimilarityOfSongs(SongData1, Population[i])
         res = res + SimilarityOfSongs(SongData2, Population[i])
         res = res + SimilarityOfSongs(SongData3, Population[i])
@@ -150,13 +153,13 @@ def Fitness(Population):
         Scores.append(res/7)
         res = 0
     return Scores
-#############################################################################
+############################################################################################
 
 
 
-#############################################################################
+############################################################################################
 # Roulette wheel
-#############################################################################
+############################################################################################
 def RouletteWheel(Population):
     print("-----------------------------------------")
     print("Roulette Wheel")
@@ -170,18 +173,18 @@ def RouletteWheel(Population):
     res = 1 - sum(NormalizedScores)
     index = len(NormalizedScores)-1
     NormalizedScores[index] = NormalizedScores[index] + res
-    q = list(range(0, len(PrimaryPopulation)))
+    q = list(range(0, len(Population)))
     for i in range(0, NumberOfPrimaryPopulation):
         draw = choice(q, 1, p=NormalizedScores)
         NewPopulation.append(Population[draw[0]])
     return NewPopulation
-#############################################################################
+############################################################################################
 
 
 
-#############################################################################
+############################################################################################
 # Mutation
-#############################################################################
+############################################################################################
 def RSMMutation(Population):
     print("-----------------------------------------")
     print("Mutation")
@@ -189,34 +192,34 @@ def RSMMutation(Population):
     for i in range(0, NumberOfPrimaryPopulation):
         choose = random.uniform(0, 1)
         if choose <= MutationProbability:
-            a = random.randint(0, (SongLength*SampleRate))
-            b = random.randint(0, (SongLength*SampleRate)-1)
+            a = random.randint(0, int(SongLength*SampleRate))
+            b = random.randint(0, int(SongLength*SampleRate)-1)
             while a == b:
-                b = random.randint(0, (SongLength * SampleRate)-1)
+                b = random.randint(0, int(SongLength * SampleRate)-1)
             if a > b:
                 while a > b:
-                    n1 = Population[a]
-                    n2 = Population[b]
-                    Population[b] = n1
-                    Population[a] = n2
+                    n1 = Population[i][a]
+                    n2 = Population[i][b]
+                    Population[i][b] = n1
+                    Population[i][a] = n2
                     a = a - 1
                     b = b + 1
             else:
                 while a < b:
-                    n1 = Population[a]
-                    n2 = Population[b]
-                    Population[b] = n1
-                    Population[a] = n2
+                    n1 = Population[i][a]
+                    n2 = Population[i][b]
+                    Population[i][b] = n1
+                    Population[i][a] = n2
                     a = a + 1
                     b = b - 1
     return Population
-#############################################################################
+############################################################################################
 
 
 
-#############################################################################
+############################################################################################
 # Mixing
-#############################################################################
+############################################################################################
 def Mixing(Person1, Person2):
     child1 = []
     child2 = []
@@ -224,17 +227,18 @@ def Mixing(Person1, Person2):
         child1.append((Person1[i]+(2*Person2[i]))/3)
         child2.append((Person2[i] + (2 * Person1[i])) / 3)
     return [Person1, Person2, child1, child2]
-#############################################################################
+############################################################################################
 
 
 
-#############################################################################
+############################################################################################
 # Mating
-#############################################################################
+############################################################################################
 def Mating(Population):
+    i = 0
     NewPopulation = []
     PopulationForMating = RouletteWheel(Population)
-    for i in range(0, NumberOfPrimaryPopulation):
+    while i < (NumberOfPrimaryPopulation - 1):
         n1 = PopulationForMating[i]
         n2 = PopulationForMating[i + 1]
         res = Mixing(n1, n2)
@@ -242,17 +246,56 @@ def Mating(Population):
         NewPopulation.append(res[1])
         NewPopulation.append(res[2])
         NewPopulation.append(res[3])
+        i = i + 2
     return NewPopulation
-#############################################################################
+############################################################################################
 
 
 
-#############################################################################
+############################################################################################
 # Test
-#############################################################################
-print(SimilarityOfSongs(SongData1, SongData2))
-print(RouletteWheel(PrimaryPopulation))
-#############################################################################
+############################################################################################
+FitnessAvrage = []
+FitnessMaximum = []
+IndexOfBest = 0
+print("##########################################################")
+print("Welcome")
+print("##########################################################")
+Population = copy.deepcopy(PrimaryPopulation)
+for i in range(0, NumberOfGenerations):
+    print("##########################################################")
+    print("Generation number ", i+1)
+    print("##########################################################")
+    Population2 = Mating(Population)
+    Population3 = RSMMutation(Population2)
+    Population4 = RouletteWheel(Population3)
+    Population = copy.deepcopy(Population4)
+    Scores = Fitness(Population)
+    IndexOfBest = Scores.index(max(Scores))
+    FitnessAvrage.append(sum(Scores)/len(Scores))
+    FitnessMaximum.append(max(Scores))
+############################################################################################
+
+
+
+############################################################################################
+# Produce the song
+############################################################################################
+data = Population[IndexOfBest]
+scipy.io.wavfile.write('sample.wav', SampleRate, IndexOfBest.astype(np.int16))
+############################################################################################
+
+
+
+############################################################################################
+# Plot
+############################################################################################
+plt.plot(FitnessAvrage)
+plt.plot(FitnessMaximum)
+plt.show()
+############################################################################################
+
+
 
 # heuristic to see the similarity of learning data and choose base on that to give songs value with fuzzy logic
 # find max and min of learning songs and learn and generat primary population based on that.
