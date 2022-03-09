@@ -16,14 +16,14 @@ import numpy as np
 # General info of algorithm
 ############################################################################################
 # Number of primary population
-NumberOfPrimaryPopulation = 30
+NumberOfPrimaryPopulation = 100
 # Number of Generations
-NumberOfGenerations = 30
+NumberOfGenerations = 100
 # Mutation Probability
 MutationProbability = 0.1
 # Length of each piece
 LengthOfEachPiece = 20
-# Length of result 
+# Length of result
 LengthOfResult = 10
 # Input 1
 song1 = [[14, 0, 0, 0, 0],
@@ -65,7 +65,7 @@ song2 = [[10, 0, 0, 0, 0],
          [5, 0, 0, 0, 0],
          [6, 0, 0, 0, 0],
          [8, 0, 0, 0, 0],
-         [10, 0, 0, 0, 0]
+         [10, 0, 0, 0, 0],
          [10, 0, 0, 0, 0]]
 # Input 3
 song3 = [[6, 0, 0, 0, 0],
@@ -475,13 +475,28 @@ ChordsDistanses = [
 ############################################################################################
 PrimaryPopulation = []
 for i in range(0, NumberOfPrimaryPopulation):
-    for j in range(0, len(song1))
-    x1 = random.randint(0, 36)
-    x2 = random.randint(x1 + 1, 36)
-    x3 = random.randint(x2 + 1, 36)
-    x4 = random.randint(x3 + 1, 36)
-    x5 = random.randint(x4 + 1, 36)
-    
+    PrimaryPopulation.append([])
+    for j in range(0, LengthOfEachPiece):
+        x1 = random.randint(0, 36)
+        if x1 < 36:
+            x2 = random.randint(x1 + 1, 36)
+        else:
+            x2 = random.randint(36, 36)
+        if x2 < 36:
+            x3 = random.randint(x2 + 1, 36)
+        else:
+            x3 = random.randint(36, 36)
+        if x3 < 36:
+            x4 = random.randint(x3 + 1, 36)
+        else:
+            x4 = random.randint(36, 36)
+        if x4 < 36:
+            x5 = random.randint(x4 + 1, 36)
+        else:
+            x5 = random.randint(36, 36)
+        PrimaryPopulation[i].append([x1, x2, x3, x4, x5])
+
+print(len(PrimaryPopulation))
 ############################################################################################
 
 
