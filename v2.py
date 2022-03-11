@@ -20,7 +20,7 @@ from music21 import stream, note
 # Number of primary population
 NumberOfPrimaryPopulation = 100
 # Number of Generations
-NumberOfGenerations = 100
+NumberOfGenerations = 200
 # Mutation Probability
 MutationProbability = 0.5
 # Length of each piece
@@ -481,20 +481,31 @@ PrimaryPopulation = []
 for i in range(0, NumberOfPrimaryPopulation):
     PrimaryPopulation.append([])
     for j in range(0, LengthOfEachPiece):
-        x1 = random.randint(1, Domain)
-        if x1 < Domain:
+        x1 = random.randint(0, Domain)
+        if x1 < Domain and x1 != 0:
             x2 = random.randint(x1 + 1, Domain)
         else:
             x2 = 0
-        if x2 < Domain:
+            x3 = 0
+            x4 = 0
+            x5 = 0
+            PrimaryPopulation[i].append([x1, x2, x3, x4, x5])
+            continue
+        if x2 < Domain and x2 != 0:
             x3 = random.randint(x2 + 1, Domain)
         else:
             x3 = 0
-        if x3 < Domain:
+            x4 = 0
+            x5 = 0
+            PrimaryPopulation[i].append([x1, x2, x3, x4, x5])
+            continue
+        if x3 < Domain and x3 != 0:
             x4 = random.randint(x3 + 1, Domain)
         else:
             x4 = 0
-        if x4 < Domain:
+            x5 = 0
+            PrimaryPopulation[i].append([x1, x2, x3, x4, x5])
+        if x4 < Domain and x4 != 0:
             x5 = random.randint(x4 + 1, Domain)
         else:
             x5 = 0
@@ -570,25 +581,29 @@ def Mutation(Population):
         choose = random.uniform(0, 1)
         if choose <= MutationProbability:
             a = random.randint(0, LengthOfEachPiece - 1)
-            if Population[i][a][0] > 0:
-                Population[i][a][0] = random.randint(1, Domain)
-            if Population[i][a][0] < Domain:
-                if Population[i][a][0] > 0:
+            Population[i][a][0] = random.randint(0, Domain)
+            if Population[i][a][0] < Domain and Population[i][a][0] != 0:
                     Population[i][a][1] = random.randint(Population[i][a][0] + 1, Domain)
             else:
                 Population[i][a][1] = 0
-            if Population[i][a][1] < Domain:
-                if Population[i][a][0] > 0:
+                Population[i][a][2] = 0
+                Population[i][a][3] = 0
+                Population[i][a][4] = 0
+                continue
+            if Population[i][a][1] < Domain and Population[i][a][1] != 0:
                     Population[i][a][2] = random.randint(Population[i][a][1] + 1, Domain)
             else:
                 Population[i][a][2] = 0
-            if Population[i][a][2] < Domain:
-                if Population[i][a][0] > 0:
+                Population[i][a][3] = 0
+                Population[i][a][4] = 0
+                continue
+            if Population[i][a][2] < Domain and Population[i][a][2] != 0:
                     Population[i][a][3] = random.randint(Population[i][a][2] + 1, Domain)
             else:
                 Population[i][a][3] = 0
-            if Population[i][a][3] < Domain:
-                if Population[i][a][0] > 0:
+                Population[i][a][4] = 0
+                continue
+            if Population[i][a][3] < Domain and Population[i][a][2] != 0:
                     Population[i][a][4] = random.randint(Population[i][a][3] + 1, Domain)
             else:
                 Population[i][a][4] = 0
