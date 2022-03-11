@@ -1,6 +1,7 @@
 ############################################################################################
 # Libraries
 ############################################################################################
+import math
 import random
 import matplotlib.pyplot as plt
 import scipy
@@ -8,6 +9,7 @@ from numpy.random import choice
 from scipy.io.wavfile import read as wavread
 import copy
 import numpy as np
+from music21 import stream, note
 ############################################################################################
 
 
@@ -20,23 +22,25 @@ NumberOfPrimaryPopulation = 100
 # Number of Generations
 NumberOfGenerations = 100
 # Mutation Probability
-MutationProbability = 0.1
+MutationProbability = 0.5
 # Length of each piece
 LengthOfEachPiece = 20
 # Length of result
 LengthOfResult = 10
+# Domain
+Domain = 12
 # Input 1
-song1 = [[14, 0, 0, 0, 0],
-         [15, 0, 0, 0, 0],
-         [17, 0, 0, 0, 0],
-         [15, 0, 0, 0, 0],
-         [14, 0, 0, 0, 0],
+song1 = [[2, 0, 0, 0, 0],
+         [3, 0, 0, 0, 0],
+         [4, 0, 0, 0, 0],
+         [3, 0, 0, 0, 0],
+         [2, 0, 0, 0, 0],
          [11, 0, 0, 0, 0],
-         [14, 0, 0, 0, 0],
-         [15, 0, 0, 0, 0],
-         [17, 0, 0, 0, 0],
-         [15, 0, 0, 0, 0],
-         [14, 0, 0, 0, 0],
+         [2, 0, 0, 0, 0],
+         [3, 0, 0, 0, 0],
+         [4, 0, 0, 0, 0],
+         [3, 0, 0, 0, 0],
+         [2, 0, 0, 0, 0],
          [11, 0, 0, 0, 0],
          [10, 0, 0, 0, 0],
          [10, 0, 0, 0, 0],
@@ -110,31 +114,31 @@ song4 = [[10, 0, 0, 0, 0],
          [3, 0, 0, 0, 0],
          [3, 0, 0, 0, 0]]
 # Input 5
-song5 = [[20, 0, 0, 0, 0],
-         [20, 0, 0, 0, 0],
-         [17, 0, 0, 0, 0],
-         [17, 0, 0, 0, 0],
-         [15, 0, 0, 0, 0],
-         [15, 0, 0, 0, 0],
+song5 = [[8, 0, 0, 0, 0],
+         [8, 0, 0, 0, 0],
+         [5, 0, 0, 0, 0],
+         [5, 0, 0, 0, 0],
+         [3, 0, 0, 0, 0],
+         [3, 0, 0, 0, 0],
          [10, 0, 0, 0, 0],
          [10, 0, 0, 0, 0],
          [0, 0, 0, 0, 0],
          [0, 0, 0, 0, 0],
          [0, 0, 0, 0, 0],
          [0, 0, 0, 0, 0],
-         [17, 0, 0, 0, 0],
-         [17, 0, 0, 0, 0],
-         [15, 0, 0, 0, 0],
-         [15, 0, 0, 0, 0],
-         [13, 0, 0, 0, 0],
-         [13, 0, 0, 0, 0],
+         [5, 0, 0, 0, 0],
+         [5, 0, 0, 0, 0],
+         [3, 0, 0, 0, 0],
+         [3, 0, 0, 0, 0],
+         [1, 0, 0, 0, 0],
+         [1, 0, 0, 0, 0],
          [8, 0, 0, 0, 0],
          [8, 0, 0, 0, 0]]
 # Input 6
-song6 = [[15, 0, 0, 0, 0],
-         [15, 0, 0, 0, 0],
-         [13, 0, 0, 0, 0],
-         [13, 0, 0, 0, 0],
+song6 = [[3, 0, 0, 0, 0],
+         [3, 0, 0, 0, 0],
+         [1, 0, 0, 0, 0],
+         [1, 0, 0, 0, 0],
          [11, 0, 0, 0, 0],
          [11, 0, 0, 0, 0],
          [6, 0, 0, 0, 0],
@@ -147,15 +151,15 @@ song6 = [[15, 0, 0, 0, 0],
          [6, 0, 0, 0, 0],
          [8, 0, 0, 0, 0],
          [10, 0, 0, 0, 0],
-         [13, 0, 0, 0, 0],
+         [1, 0, 0, 0, 0],
          [11, 0, 0, 0, 0],
          [10, 0, 0, 0, 0],
          [0, 0, 0, 0, 0]]
 # Input 7
 song7 = [[7, 0, 0, 0, 0],
          [10, 0, 0, 0, 0],
-         [15, 0, 0, 0, 0],
-         [13, 0, 0, 0, 0],
+         [3, 0, 0, 0, 0],
+         [1, 0, 0, 0, 0],
          [11, 0, 0, 0, 0],
          [10, 0, 0, 0, 0],
          [11, 0, 0, 0, 0],
@@ -189,29 +193,29 @@ song8 = [[8, 11, 0, 0, 0],
          [3, 6, 0, 0, 0],
          [5, 8, 0, 0, 0],
          [6, 10, 0, 0, 0],
-         [10, 13, 0, 0, 0],
+         [10, 1, 0, 0, 0],
          [8, 11, 0, 0, 0],
          [6, 10, 0, 0, 0],
          [0, 0, 0, 0, 0]]
 # Input 9
-song9 = [[15, 0, 0, 0, 0],
-         [15, 0, 0, 0, 0],
-         [15, 18, 22, 0, 0],
-         [15, 18, 22, 0, 0],
-         [15, 18, 22, 0, 0],
-         [15, 18, 22, 0, 0],
+song9 = [[3, 0, 0, 0, 0],
+         [3, 0, 0, 0, 0],
+         [3, 6, 10, 0, 0],
+         [3, 6, 10, 0, 0],
+         [3, 6, 10, 0, 0],
+         [3, 6, 10, 0, 0],
          [1, 0, 0, 0, 0],
          [1, 0, 0, 0, 0],
-         [1, 17, 22, 0, 0],
-         [1, 17, 22, 0, 0],
-         [1, 17, 22, 0, 0],
-         [1, 17, 22, 0, 0],
+         [1, 5, 10, 0, 0],
+         [1, 5, 10, 0, 0],
+         [1, 5, 10, 0, 0],
+         [1, 5, 10, 0, 0],
          [11, 0, 0, 0, 0],
          [11, 0, 0, 0, 0],
-         [11, 15, 18, 0, 0],
-         [11, 15, 18, 0, 0],
-         [11, 15, 18, 0, 0],
-         [11, 15, 18, 0, 0],
+         [11, 3, 6, 0, 0],
+         [11, 3, 6, 0, 0],
+         [11, 3, 6, 0, 0],
+         [11, 3, 6, 0, 0],
          [0, 0, 0, 0, 0],
          [0, 0, 0, 0, 0]]
 ############################################################################################
@@ -477,27 +481,232 @@ PrimaryPopulation = []
 for i in range(0, NumberOfPrimaryPopulation):
     PrimaryPopulation.append([])
     for j in range(0, LengthOfEachPiece):
-        x1 = random.randint(0, 36)
-        if x1 < 36:
-            x2 = random.randint(x1 + 1, 36)
+        x1 = random.randint(1, Domain)
+        if x1 < Domain:
+            x2 = random.randint(x1 + 1, Domain)
         else:
-            x2 = random.randint(36, 36)
-        if x2 < 36:
-            x3 = random.randint(x2 + 1, 36)
+            x2 = 0
+        if x2 < Domain:
+            x3 = random.randint(x2 + 1, Domain)
         else:
-            x3 = random.randint(36, 36)
-        if x3 < 36:
-            x4 = random.randint(x3 + 1, 36)
+            x3 = 0
+        if x3 < Domain:
+            x4 = random.randint(x3 + 1, Domain)
         else:
-            x4 = random.randint(36, 36)
-        if x4 < 36:
-            x5 = random.randint(x4 + 1, 36)
+            x4 = 0
+        if x4 < Domain:
+            x5 = random.randint(x4 + 1, Domain)
         else:
-            x5 = random.randint(36, 36)
+            x5 = 0
         PrimaryPopulation[i].append([x1, x2, x3, x4, x5])
-
-print(len(PrimaryPopulation))
 ############################################################################################
+
+
+
+############################################################################################
+# Percent of similarity of two songs
+############################################################################################
+def SimilarityOfSongs(DataOfSong1, DataOfSong2):
+    SimilarityScore = []
+    for i in range(0, LengthOfEachPiece):
+        for j in range(0, 5):
+            res = abs(DataOfSong1[i][j]-DataOfSong2[i][j])
+            SimilarityScore.append(1 - math.sqrt(math.sqrt(math.sqrt(math.sqrt(math.sqrt(res / Domain))))))
+    return 100 * sum(SimilarityScore) / len(SimilarityScore)
+############################################################################################
+
+
+
+############################################################################################
+# Fitness
+############################################################################################
+def Fitness(Population):
+    Scores = []
+    res = 0
+    for i in range(0, len(Population)):
+        res = res + SimilarityOfSongs(song1, Population[i])
+        res = res + SimilarityOfSongs(song2, Population[i])
+        res = res + SimilarityOfSongs(song3, Population[i])
+        res = res + SimilarityOfSongs(song4, Population[i])
+        res = res + SimilarityOfSongs(song5, Population[i])
+        res = res + SimilarityOfSongs(song6, Population[i])
+        res = res + SimilarityOfSongs(song7, Population[i])
+        res = res + SimilarityOfSongs(song8, Population[i])
+        res = res + SimilarityOfSongs(song9, Population[i])
+        Scores.append(res/9)
+        res = 0
+    return Scores
+############################################################################################
+
+
+
+############################################################################################
+# Roulette wheel
+############################################################################################
+def RouletteWheel(Population):
+    NewPopulation = []
+    Scores = Fitness(Population)
+    ScoreSum = sum(Scores)
+    NormalizedScores = []
+    for i in range(0, len(Population)):
+        NormalizedScores.append(Scores[i]/ScoreSum)
+    res = 1 - sum(NormalizedScores)
+    index = len(NormalizedScores)-1
+    NormalizedScores[index] = NormalizedScores[index] + res
+    q = list(range(0, len(Population)))
+    for i in range(0, NumberOfPrimaryPopulation):
+        draw = choice(q, 1, p=NormalizedScores)
+        NewPopulation.append(Population[draw[0]])
+    return NewPopulation
+############################################################################################
+
+
+
+############################################################################################
+# Mutation
+############################################################################################
+def Mutation(Population):
+    for i in range(0, NumberOfPrimaryPopulation):
+        choose = random.uniform(0, 1)
+        if choose <= MutationProbability:
+            a = random.randint(0, LengthOfEachPiece - 1)
+            if Population[i][a][0] > 0:
+                Population[i][a][0] = random.randint(1, Domain)
+            if Population[i][a][0] < Domain:
+                if Population[i][a][0] > 0:
+                    Population[i][a][1] = random.randint(Population[i][a][0] + 1, Domain)
+            else:
+                Population[i][a][1] = 0
+            if Population[i][a][1] < Domain:
+                if Population[i][a][0] > 0:
+                    Population[i][a][2] = random.randint(Population[i][a][1] + 1, Domain)
+            else:
+                Population[i][a][2] = 0
+            if Population[i][a][2] < Domain:
+                if Population[i][a][0] > 0:
+                    Population[i][a][3] = random.randint(Population[i][a][2] + 1, Domain)
+            else:
+                Population[i][a][3] = 0
+            if Population[i][a][3] < Domain:
+                if Population[i][a][0] > 0:
+                    Population[i][a][4] = random.randint(Population[i][a][3] + 1, Domain)
+            else:
+                Population[i][a][4] = 0
+    return Population
+############################################################################################
+
+
+
+############################################################################################
+# Mating
+############################################################################################
+def OnePointCrossover(Population):
+    i = 0
+    NewPopulation = RouletteWheel(Population)
+    result = []
+    while i < NumberOfPrimaryPopulation:
+        P1 = NewPopulation[i]
+        P2 = NewPopulation[i + 1]
+        BreakingPoint = random.randint(0, LengthOfEachPiece - 1)
+        result.append(NewPopulation[i])
+        result.append(NewPopulation[i + 1])
+        p1 = []
+        p2 = []
+        for j in range(0, LengthOfEachPiece):
+            if j <= BreakingPoint:
+                p1.append(NewPopulation[i][j])
+                p2.append(NewPopulation[i+1][j])
+            else:
+                p1.append(NewPopulation[i + 1][j])
+                p2.append(NewPopulation[i][j])
+        result.append(p1)
+        result.append(p2)
+        i = i + 2
+    return result
+############################################################################################
+
+
+
+############################################################################################
+# Test
+############################################################################################
+FitnessAvrage = []
+FitnessMaximum = []
+IndexOfBest = 0
+print("##########################################################")
+print("Welcome")
+print("##########################################################")
+Population = copy.deepcopy(PrimaryPopulation)
+for i in range(0, NumberOfGenerations):
+    print("Generation number ", i+1)
+    Population2 = OnePointCrossover(Population)
+    Population3 = Mutation(Population2)
+    Population4 = RouletteWheel(Population3)
+    Population = copy.deepcopy(Population4)
+    Scores = Fitness(Population)
+    IndexOfBest = Scores.index(max(Scores))
+    FitnessAvrage.append(sum(Scores)/len(Scores))
+    FitnessMaximum.append(max(Scores))
+############################################################################################
+
+
+
+############################################################################################
+# Hear the best melody
+############################################################################################
+Scores = Fitness(Population)
+IndexOfBest = Scores.index(max(Scores))
+best = Population[IndexOfBest]
+print(best)
+# s = stream.Stream()
+# for i in range(0, len(best)):
+#     if best[i][0] == 0:
+#         s.append()
+#     if best[i][0] == 1:
+#         s.append('C4')
+#     if best[i][0] == 2:
+#         s.append('Db4')
+#     if best[i][0] == 3:
+#         s.append('D4')
+#     if best[i][0] == 4:
+#         s.append('Eb4')
+#     if best[i][0] == 5:
+#         s.append('E4')
+#     if best[i][0] == 6:
+#         s.append('F4')
+#     if best[i][0] == 7:
+#         s.append('Gb4')
+#     if best[i][0] == 8:
+#         s.append('G4')
+#     if best[i][0] == 9:
+#         s.append('Ab4')
+#     if best[i][0] == 10:
+#         s.append('A4')
+#     if best[i][0] == 11:
+#         s.append('Bb4')
+#     if best[i][0] == 12:
+#         s.append('B4')
+# s.show()
+############################################################################################
+
+
+
+############################################################################################
+# Print
+############################################################################################
+# for i in range(0, len(Population)):
+#     print(Population[i])
+############################################################################################
+
+
+
+############################################################################################
+# Plot
+############################################################################################
+plt.plot(FitnessAvrage)
+plt.plot(FitnessMaximum)
+plt.show()
+###########################################################################################
 
 
 
@@ -507,295 +716,6 @@ print(len(PrimaryPopulation))
 
 ############################################################################################
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# ############################################################################################
-# # Song Decoder
-# ############################################################################################
-# def SongDecoder(SongName):
-#     DataOfSong = []
-#     [_, y] = wavread(SongName)
-#     for i in range(0, int(SongLength*SampleRate)):
-#         y1, y2 = [y[i][0], y[i][1]]
-#         res = int((y1 + y2) / 2)
-#         DataOfSong.append(res)
-#     return DataOfSong
-# ############################################################################################
-#
-#
-#
-# ############################################################################################
-# # Data of Songs
-# ############################################################################################
-# SongData1 = SongDecoder(SongName1)
-# SongData2 = SongDecoder(SongName2)
-# SongData3 = SongDecoder(SongName3)
-# SongData4 = SongDecoder(SongName4)
-# SongData5 = SongDecoder(SongName5)
-# SongData6 = SongDecoder(SongName6)
-# SongData7 = SongDecoder(SongName7)
-# ############################################################################################
-#
-#
-#
-# ############################################################################################
-# # Find the  local minimum and maximum
-# ############################################################################################
-# domainOfAllSongs = []
-# domainOfAllSongs.append(min(SongData1))
-# domainOfAllSongs.append(max(SongData1))
-# domainOfAllSongs.append(min(SongData2))
-# domainOfAllSongs.append(max(SongData2))
-# domainOfAllSongs.append(min(SongData3))
-# domainOfAllSongs.append(max(SongData3))
-# domainOfAllSongs.append(min(SongData4))
-# domainOfAllSongs.append(max(SongData4))
-# domainOfAllSongs.append(min(SongData5))
-# domainOfAllSongs.append(max(SongData5))
-# domainOfAllSongs.append(min(SongData6))
-# domainOfAllSongs.append(max(SongData6))
-# domainOfAllSongs.append(min(SongData7))
-# domainOfAllSongs.append(max(SongData7))
-# MinOfDomain = min(domainOfAllSongs)
-# MaxOfDomain = max(domainOfAllSongs)
-# Domain = MaxOfDomain - MinOfDomain
-# print(MinOfDomain, MaxOfDomain, Domain)
-# ############################################################################################
-#
-#
-#
-# ############################################################################################
-# # Random Primary Population
-# ############################################################################################
-# print("-----------------------------------------")
-# print("Primary Population")
-# print("-----------------------------------------")
-# PrimaryPopulation = []
-# for i in range(0, NumberOfPrimaryPopulation):
-#     PrimaryPopulation.append([])
-#     print(i)
-#     for _ in range(0, int(SongLength*SampleRate)):
-#         PrimaryPopulation[i].append(random.randint(MinOfDomain, MaxOfDomain))
-# ############################################################################################
-#
-#
-#
-# ############################################################################################
-# # Percent of similarity of two songs
-# ############################################################################################
-# def SimilarityOfSongs(DataOfSong1, DataOfSong2):
-#     SimilarityScore = []
-#     # 1-(DataOfSong1[i][0] - DataOfSong2[i][0])/Domain
-#     for i in range(0, int(SongLength*SampleRate)):
-#         res = abs(DataOfSong1[i] - DataOfSong2[i])
-#         SimilarityScore.append(1 - res / Domain)
-#     return sum(SimilarityScore)/len(SimilarityScore)
-# ############################################################################################
-#
-#
-#
-# ############################################################################################
-# # Fitness function
-# ############################################################################################
-# def Fitness(Population):
-#     print("-----------------------------------------")
-#     print("Fitness Function")
-#     print("-----------------------------------------")
-#     Scores = []
-#     res = 0
-#     for i in range(0, len(Population)):
-#         res = res + SimilarityOfSongs(SongData1, Population[i])
-#         res = res + SimilarityOfSongs(SongData2, Population[i])
-#         res = res + SimilarityOfSongs(SongData3, Population[i])
-#         res = res + SimilarityOfSongs(SongData4, Population[i])
-#         res = res + SimilarityOfSongs(SongData5, Population[i])
-#         res = res + SimilarityOfSongs(SongData6, Population[i])
-#         res = res + SimilarityOfSongs(SongData7, Population[i])
-#         Scores.append(res/7)
-#         res = 0
-#     return Scores
-# ############################################################################################
-#
-#
-#
-# ############################################################################################
-# # Roulette wheel
-# ############################################################################################
-# def RouletteWheel(Population):
-#     print("-----------------------------------------")
-#     print("Roulette Wheel")
-#     print("-----------------------------------------")
-#     NewPopulation = []
-#     Scores = Fitness(Population)
-#     ScoreSum = sum(Scores)
-#     NormalizedScores = []
-#     for i in range(0, len(Population)):
-#         NormalizedScores.append(Scores[i]/ScoreSum)
-#     res = 1 - sum(NormalizedScores)
-#     index = len(NormalizedScores)-1
-#     NormalizedScores[index] = NormalizedScores[index] + res
-#     q = list(range(0, len(Population)))
-#     for i in range(0, NumberOfPrimaryPopulation):
-#         draw = choice(q, 1, p=NormalizedScores)
-#         NewPopulation.append(Population[draw[0]])
-#     return NewPopulation
-# ############################################################################################
-#
-#
-#
-# ############################################################################################
-# # Mutation
-# ############################################################################################
-# def RSMMutation(Population):
-#     print("-----------------------------------------")
-#     print("Mutation")
-#     print("-----------------------------------------")
-#     for i in range(0, NumberOfPrimaryPopulation):
-#         choose = random.uniform(0, 1)
-#         if choose <= MutationProbability:
-#             a = random.randint(0, int(SongLength*SampleRate))
-#             b = random.randint(0, int(SongLength*SampleRate)-1)
-#             while a == b:
-#                 b = random.randint(0, int(SongLength * SampleRate)-1)
-#             if a > b:
-#                 while a > b:
-#                     n1 = Population[i][a]
-#                     n2 = Population[i][b]
-#                     Population[i][b] = n1
-#                     Population[i][a] = n2
-#                     a = a - 1
-#                     b = b + 1
-#             else:
-#                 while a < b:
-#                     n1 = Population[i][a]
-#                     n2 = Population[i][b]
-#                     Population[i][b] = n1
-#                     Population[i][a] = n2
-#                     a = a + 1
-#                     b = b - 1
-#     return Population
-# ############################################################################################
-#
-#
-#
-# ############################################################################################
-# # Mixing
-# ############################################################################################
-# def Mixing(Person1, Person2):
-#     child1 = []
-#     child2 = []
-#     for i in range(0, len(Person1)):
-#         child1.append((Person1[i]+(2*Person2[i]))/3)
-#         child2.append((Person2[i] + (2 * Person1[i])) / 3)
-#     return [Person1, Person2, child1, child2]
-# ############################################################################################
-#
-#
-#
-# ############################################################################################
-# # Mating
-# ############################################################################################
-# def Mating(Population):
-#     i = 0
-#     NewPopulation = []
-#     PopulationForMating = RouletteWheel(Population)
-#     while i < (NumberOfPrimaryPopulation - 1):
-#         n1 = PopulationForMating[i]
-#         n2 = PopulationForMating[i + 1]
-#         res = Mixing(n1, n2)
-#         NewPopulation.append(res[0])
-#         NewPopulation.append(res[1])
-#         NewPopulation.append(res[2])
-#         NewPopulation.append(res[3])
-#         i = i + 2
-#     return NewPopulation
-# ############################################################################################
-#
-#
-#
-# ############################################################################################
-# # Test
-# ############################################################################################
-# FitnessAvrage = []
-# FitnessMaximum = []
-# IndexOfBest = 0
-# print("##########################################################")
-# print("Welcome")
-# print("##########################################################")
-# Population = copy.deepcopy(PrimaryPopulation)
-# for i in range(0, NumberOfGenerations):
-#     print("##########################################################")
-#     print("Generation number ", i+1)
-#     print("##########################################################")
-#     Population2 = Mating(Population)
-#     Population3 = RSMMutation(Population2)
-#     Population4 = RouletteWheel(Population3)
-#     Population = copy.deepcopy(Population4)
-#     Scores = Fitness(Population)
-#     IndexOfBest = Scores.index(max(Scores))
-#     FitnessAvrage.append(sum(Scores)/len(Scores))
-#     FitnessMaximum.append(max(Scores))
-# ############################################################################################
-#
-#
-#
-# ############################################################################################
-# # Produce the song
-# ############################################################################################
-# data = Population[IndexOfBest]
-# for i in range(0, len(data)):
-#     res = int(data[i])
-#     data[i] = res
-# print(data)
-# data2 = np.array(data)
-# scipy.io.wavfile.write('sample.wav', SampleRate, data2.astype(np.int16))
-# ############################################################################################
-#
-#
-#
-# ############################################################################################
-# # Plot
-# ############################################################################################
-# plt.plot(FitnessAvrage)
-# plt.plot(FitnessMaximum)
-# plt.show()
-###########################################################################################
 
 
 # heuristic to see the similarity of learning data and choose base on that to give songs value with fuzzy logic
