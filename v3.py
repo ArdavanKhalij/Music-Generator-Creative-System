@@ -121,8 +121,6 @@ def SuitableDistances(Song):
                 Score = Score + SFNC
             elif (Song[i] == 1 and Song[i+1] == 3) or (Song[i] == 3 and Song[i+1] == 1) or (Song[i] == 3 and Song[i+1] == 5) or (Song[i] == 5 and Song[i+1] == 3) or (Song[i] == 5 and Song[i+1] == 6) or (Song[i] == 6 and Song[i+1] == 5) or (Song[i] == 6 and Song[i+1] == 8) or (Song[i] == 8 and Song[i+1] == 6) or (Song[i] == 8 and Song[i+1] == 10) or (Song[i] == 10 and Song[i+1] == 8) or (Song[i] == 10 and Song[i+1] == 12) or (Song[i] == 12 and Song[i+1] == 10):
                 Score = Score + SFCN
-            # elif Song[i] == 2 or Song[i] == 4 or Song[i] == 7 or Song[i] == 9 or Song[i] == 11 or Song[i + 1] == 2 or Song[i + 1] == 4 or Song[i + 1] == 7 or Song[i + 1] == 9 or Song[i + 1] == 11:
-            #     Score = Score + 1
             else:
                 pass
         i = i + 1
