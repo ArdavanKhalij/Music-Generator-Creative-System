@@ -20,7 +20,7 @@ NumberOfPrimaryPopulation = 500
 NumberOfGenerations = 200
 # Mutation Probability
 MutationProbability = 0.2
-# Length of each piece
+# Length of each piece`
 LengthOfEachPiece = 20
 # Length of result
 LengthOfResult = 3
@@ -244,7 +244,6 @@ def Fitness(Population):
         if len(songs) > 0:
             for j in range(0, len(songs)):
                 res = res + SimilarityOfSongs(songs[j], Population[i])
-            # res = weights[j] * res / len(songs) + SuitableDistances(Population[i])
             res = weights[j] * res + SuitableDistances(Population[i])
         else:
             pass
@@ -271,17 +270,10 @@ def RouletteWheel(Population):
     NormalizedScores = []
     for i in range(0, len(Population)):
         NormalizedScores.append(Scores[i]/ScoreSum)
-    # res = 1 - sum(NormalizedScores)
-    # index = len(NormalizedScores)-1
-    # NormalizedScores[index] = NormalizedScores[index] + res
     q = list(range(0, len(Population)))
     for i in range(0, NumberOfPrimaryPopulation):
-        # Best = Scores.index(max(Scores))
-        # NewPopulation.append(Population[Best])
-        # Scores[Best] = 0
         draw = choice(q, 1, p=NormalizedScores)
         NewPopulation.append(Population[draw[0]])
-    # print(sum(Fitness(Population))/len(Fitness(Population)), sum(Fitness(NewPopulation))/len(Fitness(NewPopulation)))
     return NewPopulation
 ############################################################################################
 
@@ -372,6 +364,8 @@ def PLAY(Songs):
 ############################################################################################
 
 
+
+############################################################################################
 diagramScores = []
 ############################################################################################
 # Test
@@ -451,6 +445,5 @@ print(result)
 # Plot
 ############################################################################################
 plt.plot(diagramScores)
-# plt.plot(FitnessMaximum)
 plt.show()
 ###########################################################################################
