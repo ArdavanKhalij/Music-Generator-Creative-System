@@ -45,7 +45,11 @@ SFCN = 3
 # Score for chords
 SFC = 4
 # Score for no change
-SFNC = 1
+SFNC = 1.5
+# Score for double distance notes
+SFCD = 2.5
+# Score for special distance notes
+SFCS = 0.5
 weights = [0] * len(songs)
 ############################################################################################
 
@@ -63,7 +67,7 @@ def SimilarityOfSongs(DataOfSong1, DataOfSong2):
         for i in range(0, LengthOfEachPiece):
             res = abs(DataOfSong1[i] - DataOfSong2[i])
             SimilarityScore.append(1 - math.sqrt(math.sqrt(math.sqrt(math.sqrt(math.sqrt(res / Domain))))))
-        Score = 20 * sum(SimilarityScore) / len(SimilarityScore)
+        Score = 100 * sum(SimilarityScore) / len(SimilarityScore)
     return Score
 ############################################################################################
 
@@ -81,6 +85,10 @@ def SuitableDistances(Song):
                 Score = Score + SFNC
             elif (Song[i] == 1 and Song[i+1] == 3) or (Song[i] == 3 and Song[i+1] == 1) or (Song[i] == 3 and Song[i+1] == 5) or (Song[i] == 5 and Song[i+1] == 3) or (Song[i] == 5 and Song[i+1] == 6) or (Song[i] == 6 and Song[i+1] == 5) or (Song[i] == 6 and Song[i+1] == 8) or (Song[i] == 8 and Song[i+1] == 6) or (Song[i] == 8 and Song[i+1] == 10) or (Song[i] == 10 and Song[i+1] == 8) or (Song[i] == 10 and Song[i+1] == 12) or (Song[i] == 12 and Song[i+1] == 10):
                 Score = Score + SFCN
+            elif (Song[i] == 1 and Song[i+1] == 5) or (Song[i] == 5 and Song[i+1] == 1) or (Song[i] == 3 and Song[i+1] == 6) or (Song[i] == 6 and Song[i+1] == 3) or (Song[i] == 5 and Song[i+1] == 8) or (Song[i] == 8 and Song[i+1] == 5) or (Song[i] == 6 and Song[i+1] == 10) or (Song[i] == 10 and Song[i+1] == 6) or (Song[i] == 8 and Song[i+1] == 12) or (Song[i] == 12 and Song[i+1] == 8):
+                Score = Score + SFCD
+            elif (Song[i] == 3 and Song[i+1] == 7) or (Song[i] == 7 and Song[i+1] == 3) or (Song[i] == 5 and Song[i+1] == 9) or (Song[i] == 9 and Song[i+1] == 5) or (Song[i] == 9 and Song[i+1] == 12) or (Song[i] == 12 and Song[i+1] == 9) or (Song[i] == 7 and Song[i+1] == 10) or (Song[i] == 10 and Song[i+1] == 7):
+                Score = Score + SFCS
             else:
                 pass
         i = i + 1
@@ -243,12 +251,11 @@ def Fitness(Population):
     for i in range(0, len(Population)):
         if len(songs) > 0:
             for j in range(0, len(songs)):
-                res = res + SimilarityOfSongs(songs[j], Population[i])
-            res = weights[j] * res + SuitableDistances(Population[i])
+                res = res + 2 * weights[j] * SimilarityOfSongs(songs[j], Population[i])
+            res = res + SuitableDistances(Population[i])
         else:
-            pass
             res = SuitableDistances(Population[i])
-        res = res + Repeat(Population[i]) + SuitableDistances(Population[i])
+        res = res + Repeat(Population[i])
         Scores.append(res)
         res = 0
     return Scores
